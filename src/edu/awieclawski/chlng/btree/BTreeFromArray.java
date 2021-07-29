@@ -51,13 +51,12 @@ class BTreeFromArray {
 	}
 
 	// Function to build tree nodes in InOrder fashion
-	public String inOrder(Node root) {
+	public void inOrder(Node root) {
 		if (root != null) {
 			inOrder(root.left);
 			ORDERED_NODES += root.key + " ";
 			inOrder(root.right);
 		}
-		return ORDERED_NODES;
 	}
 
 	// may be ArrayChallenge(strArr) in the challenge

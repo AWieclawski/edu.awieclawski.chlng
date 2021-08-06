@@ -1,4 +1,4 @@
-package edu.awieclawski.chlng.btree;
+package array.binary.tree;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 /**
  * 
  * CODERBYTE
+ * 
+ * Array Binary Tree
  * 
  * ArrayChallenge(strArr) take the array of strings stored in strArr, which will
  * represent a binary tree, and determine if the tree is symmetric (a mirror
@@ -15,9 +17,9 @@ import java.util.logging.Logger;
  * ["1", "2", "2", "3", "#", "#", "3"] then this tree looks like the following:
  * 
  */
-class BTreeFromArray {
+class Solution {
 
-	protected final static Logger LOGGER = Logger.getLogger(BTreeFromArray.class.getName()); // java.util.logging.Logger
+	protected final static Logger LOGGER = Logger.getLogger(Solution.class.getName()); // java.util.logging.Logger
 	private static String ORDERED_NODES;
 
 	// Java program to check is
@@ -63,7 +65,7 @@ class BTreeFromArray {
 	static String isByteTreeFromArraySymetric(String[] arr) {
 		ORDERED_NODES = ""; // reset
 		String result = "";
-		BTreeFromArray tree = new BTreeFromArray();
+		Solution tree = new Solution();
 
 		tree.root = tree.insertLevelOrder(arr, tree.root, 0);
 
@@ -77,14 +79,13 @@ class BTreeFromArray {
 		tree.inOrder(tree.root);
 
 		LOGGER.log(Level.INFO, "ordered nodes: [ " + ORDERED_NODES + "]");
-		
+
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 

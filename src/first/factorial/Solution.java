@@ -1,4 +1,4 @@
-package edu.awieclawski.chlng.frstfctrl;
+package first.factorial;
 
 /**
  * 

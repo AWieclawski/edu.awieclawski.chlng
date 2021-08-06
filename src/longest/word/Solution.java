@@ -1,4 +1,4 @@
-package edu.awieclawski.chlng.lngstwrd;
+package longest.word;
 
 import java.util.regex.Pattern;
 

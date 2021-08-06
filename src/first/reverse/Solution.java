@@ -1,4 +1,4 @@
-package edu.awieclawski.chlng.frstrvrs;
+package first.reverse;
 
 /**
  * CODERBYTE

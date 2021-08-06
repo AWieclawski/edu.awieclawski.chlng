@@ -1,9 +1,11 @@
-package edu.awieclawski.chlng.qmrks;
+package questions.marks;
 
 /**
  * CODERBYTE
  * 
- * Questions Marks Have the function QuestionsMarks(str) take the str string
+ * Questions Marks 
+ * 
+ * Have the function QuestionsMarks(str) take the str string
  * parameter, which will contain single digit numbers, letters, and question
  * marks, and check if there are exactly 3 question marks between every pair of
  * two numbers that add up to 10. If so, then your program should return the
@@ -21,7 +23,7 @@ package edu.awieclawski.chlng.qmrks;
  * 
  * 
  */
-public class QuestionMarks {
+public class Solution {
 	final static char QM = '?';
 	final static String TR = "true";
 	final static String FLS = "false";

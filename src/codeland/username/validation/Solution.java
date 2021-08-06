@@ -1,4 +1,4 @@
-package edu.awieclawski.chlng.srnmvldtn;
+package codeland.username.validation;
 
 import java.util.regex.Pattern;
 

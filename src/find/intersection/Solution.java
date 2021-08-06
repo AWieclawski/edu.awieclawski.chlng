@@ -1,4 +1,4 @@
-package edu.awieclawski.chlng.fndntrsctn;
+package find.intersection;
 
 import java.util.Arrays;
 import java.util.TreeSet;
@@ -32,11 +32,11 @@ public class Solution {
 		set1.retainAll(set2); // retains all elements included in argument collection
 
 		return (set1.isEmpty() ? "false"
-				: Arrays.toString(new TreeSet<>(set1).toArray()).replace("]", "").replace("[", "").replace(" ", ""));
+				: Arrays.toString(new TreeSet<>(set1).toArray()).replaceAll("[\\[\\](){}]","").replaceAll("\\s+",""));
 	}
 
 	private static TreeSet<Integer> getSet(String[] strArr, int i) {
-		return Arrays.stream(strArr[i].replace(" ", "").split(",")).map(Integer::parseInt)
+		return Arrays.stream(strArr[i].replaceAll("\\s+","").split(",")).map(Integer::parseInt)
 				.collect(toCollection(TreeSet::new));
 	}
 

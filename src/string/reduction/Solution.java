@@ -1,10 +1,12 @@
-package edu.awieclawski.chlng.stng;
+package string.reduction;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * CODEBYTE
+ * 
+ * String Reduction
  * 
  * Have the function StringReduction(str) take the str parameter being passed
  * and return the smallest number you can get through the following reduction
@@ -33,7 +35,7 @@ public class Solution {
 		int count[] = new int[3];
 		try {
 			for (int i = 0; i < n; ++i) {
-				// trick works if lower case alphanumeric character is counted
+				// trick works if lower case alphabet character is counted
 				count[str.charAt(i) - 'a']++;
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {

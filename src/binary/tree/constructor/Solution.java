@@ -1,12 +1,8 @@
 package binary.tree.constructor;
 
-import static java.util.stream.Collectors.toCollection;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,7 +36,7 @@ import java.util.Set;
  */
 public class Solution {
 
-	public static String TreeConstructor(String[] strArr) {
+	public static String masterTreeConstructor(String[] strArr) {
 		Set<String> children = new HashSet<>();
 		Map<String, Integer> parents = new HashMap<>();
 		// Build a Set containing the child nodes, which will remove duplicates, and a
@@ -64,21 +60,21 @@ public class Solution {
 		return "" + (children.size() == strArr.length);
 	}
 
-	public static String poorTreeConstructor(String[] strArr) {
-		String result = "true";
+	public static String TreeConstructor(String[] strArr) {
 		int[] parents = new int[99]; // limited to checking only two-digit numbers
 		int[] children = new int[99]; // limited to checking only two-digit numbers
-		for (String a : strArr) {
-			List<Integer> list = Arrays.stream(a.replaceAll("[\\[\\](){}]", "").replaceAll("\\s+", "").split(","))
-					.map(Integer::parseInt).collect(toCollection(ArrayList::new));
-			parents[list.get(1)]++;
-			children[list.get(0)]++;
 
-			if (parents[list.get(1)] > 2 || children[list.get(0)] > 1)
+		for (String a : strArr) {
+			Integer[] pair = Arrays.stream(a.replaceAll("[\\[\\](){}]", "").replaceAll("\\s+", "").split(","))
+					.map(Integer::parseInt).toArray(Integer[]::new);
+			parents[pair[1]]++;
+			children[pair[0]]++;
+
+			if (parents[pair[1]] > 2 || children[pair[0]] > 1)
 				return "false";
 		}
 
-		return result;
+		return "true";
 	}
 
 	public static void main(String[] args) {
@@ -100,6 +96,9 @@ public class Solution {
 		System.out.println(TreeConstructor(strArr));
 
 		strArr = new String[] { "(1,2)", "(2,4)", "(7,4)" }; // true
+		System.out.println(TreeConstructor(strArr));
+		
+		strArr = new String[] {"(10,20)", "(20,50)"}; // true
 		System.out.println(TreeConstructor(strArr));
 
 	}

@@ -38,10 +38,7 @@ public class Solution {
 				else
 					return "0";
 		}
-		if (stack.empty())
-			return "1";
-		else
-			return "0";
+		return (stack.empty() ? "1" : "0");
 	}
 
 	public static void main(String[] args) {

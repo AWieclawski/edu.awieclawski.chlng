@@ -1,6 +1,6 @@
 package min.window.substring;
 
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -196,22 +196,21 @@ public class Solution {
 		minimized = N;
 		String result = "";
 
-		System.out.println("N:" + N + ",K:" + K);
+//		System.out.println("N:" + N + ",K:" + K);
 
 		K_MATRIX_BASE = getCharCounter(K);
 		K_matrix_N_oper = getTargetInSource(N);
 //		K_MATRIX_N_BASE = getTargetInSource(N);
 
 		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());
-		System.out.println("COMBINATIONS_BASE=" + COMBINATIONS_BASE.size());
-
-		int minimizeIndicator = 0;
+//		System.out.println("COMBINATIONS_BASE=" + COMBINATIONS_BASE.size());
 
 		Map<Integer, String> map = new HashMap<>();
 
 		for (String str : COMBINATIONS_BASE) {
 
-			int length = Integer.MAX_VALUE;
+			int[] rejectIndicators = new int[2];
+			int minLength = Integer.MAX_VALUE;
 			K_matrix_N_oper = getTargetInSource(N);
 			minimized = N_BASE;
 
@@ -222,27 +221,24 @@ public class Solution {
 
 //			System.out.println("----K_matrix_N_oper=" + Arrays.deepToString(K_matrix_N_oper));
 
-			minimizeIndicator = 0;
-			char[] chArr = str.toCharArray();
+			for (char ch : str.toCharArray()) {
 
-			for (char ch : chArr) {
+				if (rejectIndicators[0] < 1 && rejectIndicators[1] < 1) {
 
-//				while (minimizeIndicator < 2) {
+					if (ch == ('0')) { // '0' erase down index
+						if (!doMinimizeDown())
+							rejectIndicators[0]++;
+					} else { // '1' erase up index, no other choice
+						if (!doMinimizeUp())
+							rejectIndicators[1]++;
+					}
+				} else
 
-				if (ch == ('0')) { // '0' erase down index
-					if (!doMinimizeDown())
-						minimizeIndicator++;
-				} else { // '1' erase up index, no other choice
-					if (!doMinimizeUp())
-						minimizeIndicator++;
-				}
-				System.out.println("---minimized=" + minimized + ",minimizeIndicator=" + minimizeIndicator);
-
-//				}
+					break; // if rejectIndicators = [1,1]
 
 			}
 
-			if (minimized.length() < length) {
+			if (minimized.length() < minLength) {
 				map.put(minimized.length(), minimized);
 			}
 
@@ -250,12 +246,7 @@ public class Solution {
 
 		result = map.get(Collections.min(map.keySet())); // minimized;
 
-		System.out.println("N:" + N + ",K:" + K + ",minimizeIndicator=" + minimizeIndicator);
-		System.out.println("map=" + map.toString());
-//		System.out.println(Arrays.toString(K_MATRIX_BASE));
-//		System.out.println("min:" + (char) N.codePointAt(MIN_INDX - 1));
-//		System.out.println("max:" + (char) N.codePointAt(MAX_INDX - 1));
-//		System.out.println(Arrays.deepToString(targetInSource));
+//		System.out.println("map=" + map.toString());
 
 		return result;
 	}
@@ -263,17 +254,16 @@ public class Solution {
 	public static void main(String[] args) {
 
 		String[] strArr = new String[] { "ahffaksfajeeubsne", "jefaa" }; // aksfaje
-//		System.out.println(MinWindowSubstring(strArr) + "\n");
-//
-//		strArr = new String[] { "aaffhkksemckelloe", "fhea" }; // affhkkse
-//		System.out.println(MinWindowSubstring(strArr) + "\n");
-
-//		strArr = new String[] { "aabdccdbcacd", "aad" }; // aabd
-		strArr = new String[] { "aabdcdbad", "aad" }; // aabd
 		System.out.println(MinWindowSubstring(strArr) + "\n");
 
-//		strArr = new String[] { "aaabaaddae", "aed" }; // dae
-//		System.out.println(MinWindowSubstring(strArr) + "\n");
+		strArr = new String[] { "aaffhkksemckelloe", "fhea" }; // affhkkse
+		System.out.println(MinWindowSubstring(strArr) + "\n");
+
+		strArr = new String[] { "aabdccdbcacd", "aad" }; // aabd
+		System.out.println(MinWindowSubstring(strArr) + "\n");
+
+		strArr = new String[] { "aaabaaddae", "aed" }; // dae
+		System.out.println(MinWindowSubstring(strArr) + "\n");
 	}
 
 }

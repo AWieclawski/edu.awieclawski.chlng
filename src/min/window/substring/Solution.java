@@ -1,6 +1,6 @@
 package min.window.substring;
 
-//import java.util.Arrays;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +38,7 @@ import java.util.Set;
 public class Solution {
 	private final static int ALPH_QTY = 26; // number of letters in the alphabet const.
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
-//	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
+	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
 	private static String N_BASE; // N String constans
 	private static Set<String> COMBINATIONS_BASE = new HashSet<>();
 	private static int[][] K_matrix_N_oper; // count array of all K letters in N String variable
@@ -199,11 +199,12 @@ public class Solution {
 //		System.out.println("N:" + N + ",K:" + K);
 
 		K_MATRIX_BASE = getCharCounter(K);
-		K_matrix_N_oper = getTargetInSource(N);
-//		K_MATRIX_N_BASE = getTargetInSource(N);
+		K_MATRIX_N_BASE = getTargetInSource(N);
+		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
 
 		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());
-//		System.out.println("COMBINATIONS_BASE=" + COMBINATIONS_BASE.size());
+
+		// System.out.println("COMBINATIONS_BASE=" + COMBINATIONS_BASE.size());
 
 		Map<Integer, String> map = new HashMap<>();
 
@@ -211,15 +212,11 @@ public class Solution {
 
 			int[] rejectIndicators = new int[2];
 			int minLength = Integer.MAX_VALUE;
-			K_matrix_N_oper = getTargetInSource(N);
+			K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
 			minimized = N_BASE;
-
-//			System.out.println("--K_matrix_N_oper=" + Arrays.deepToString(K_matrix_N_oper));
 
 			indexReset();
 			getWindow(K_matrix_N_oper);
-
-//			System.out.println("----K_matrix_N_oper=" + Arrays.deepToString(K_matrix_N_oper));
 
 			for (char ch : str.toCharArray()) {
 

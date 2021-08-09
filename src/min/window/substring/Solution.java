@@ -1,6 +1,8 @@
 package min.window.substring;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * CODERBYTE
@@ -31,15 +33,17 @@ import java.util.Arrays;
  * 
  */
 public class Solution {
-	private final static int ALPH_QTY = 26; // number of letters in the alphabet
-	private static int[] TARGET;
-	private static int[][] TARG_IN_SRC;
-	private static String MINIMIZED;
-	private static String BASE;
-	private static int MAX_INDX;
-	private static int MIN_INDX;
-	private static int[] MIN_ORDNTS; // targetInSource co-ordinates
-	private static int[] MAX_ORDNTS; // targetInSource co-ordinates
+	private final static int ALPH_QTY = 26; // number of letters in the alphabet const.
+	private static int[] K_MATRIX_BASE; // count array of all K letters const.
+	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
+	private static String N_BASE; // N String constans
+	private static Set<String> COMBINATIONS_BASE = new HashSet<>();
+	private static int[][] K_matrix_N_oper; // count array of all K letters in N String variable
+	private static String minimized;
+	private static int maxIndex;
+	private static int minIndex;
+	private static int[] minOrdnts; // targetInSource co-ordinates
+	private static int[] maxOrdnts; // targetInSource co-ordinates
 
 	private static String getWindow(int[][] intTmpArr) {
 		int count = 0;
@@ -47,16 +51,16 @@ public class Solution {
 		System.out.println(" -- ");
 		for (int[] arrInt : intTmpArr) {
 			notZeroCount = countNotZeroInArray(arrInt);
-			if (TARGET[count] > 0 && notZeroCount >= TARGET[count]) {
+			if (K_MATRIX_BASE[count] > 0 && notZeroCount >= K_MATRIX_BASE[count]) {
 				getMinFromArray(arrInt, count, notZeroCount);
 				getMaxFromArray(arrInt, count, notZeroCount);
-				System.out.println(count + "|" + Arrays.toString(arrInt) + ",MIN_INDX=" + MIN_INDX + ",MAX_INDX="
-						+ MAX_INDX + ",MIN_ORDNTS=" + Arrays.toString(MIN_ORDNTS) + ",MAX_ORDNTS="
-						+ Arrays.toString(MAX_ORDNTS));
+				System.out.println(count + "|" + Arrays.toString(arrInt) + ",MIN_INDX=" + minIndex + ",MAX_INDX="
+						+ maxIndex + ",MIN_ORDNTS=" + Arrays.toString(minOrdnts) + ",MAX_ORDNTS="
+						+ Arrays.toString(maxOrdnts));
 			}
 			count++;
 		}
-		return BASE.substring(MIN_INDX - 1, MAX_INDX);
+		return N_BASE.substring(minIndex - 1, maxIndex);
 	}
 
 	private static int countNotZeroInArray(int[] arr) {
@@ -71,9 +75,9 @@ public class Solution {
 	private static void getMinFromArray(int[] minArr, int alphNo, int remains) {
 		int count = 0;
 		for (int min : minArr) {
-			if (min < MIN_INDX && min > 0) {
-				MIN_INDX = min;
-				MIN_ORDNTS = new int[] { alphNo, count, remains };
+			if (min < minIndex && min > 0) {
+				minIndex = min;
+				minOrdnts = new int[] { alphNo, count, remains };
 			}
 			count++;
 		}
@@ -82,17 +86,17 @@ public class Solution {
 	private static void getMaxFromArray(int[] maxArr, int alphNo, int remains) {
 		int count = 0;
 		for (int max : maxArr) {
-			if (max > MAX_INDX && max > 0) {
-				MAX_INDX = max;
-				MAX_ORDNTS = new int[] { alphNo, count, remains };
+			if (max > maxIndex && max > 0) {
+				maxIndex = max;
+				maxOrdnts = new int[] { alphNo, count, remains };
 			}
 			count++;
 		}
 	}
 
 	private static boolean compareTarget(int[] source) {
-		for (int i : TARGET) {
-			if (TARGET[i] > source[i])
+		for (int i : K_MATRIX_BASE) {
+			if (K_MATRIX_BASE[i] > source[i])
 				return false;
 		}
 		return true;
@@ -112,7 +116,7 @@ public class Solution {
 		int index = 1; // starts from 1
 		for (char ch : source.toCharArray()) {
 			int alphabetNo = (ch - 'a');
-			if (TARGET[alphabetNo] > 0) {
+			if (K_MATRIX_BASE[alphabetNo] > 0) {
 				targetInSource[alphabetNo][indexCounter[alphabetNo]] = index;
 				indexCounter[alphabetNo]++;
 			}
@@ -122,63 +126,104 @@ public class Solution {
 	}
 
 	private static boolean fitWindow(int[][] intTmpArr) {
-		MINIMIZED = getWindow(intTmpArr);
-		if (compareTarget(getCharCounter(MINIMIZED))) {
+		minimized = getWindow(intTmpArr);
+		if (compareTarget(getCharCounter(minimized))) {
 			return true;
 		}
 		return false;
 	}
 
+	private static void indexReset() {
+		minIndex = Integer.MAX_VALUE;
+		maxIndex = Integer.MIN_VALUE;
+	}
+
+	private static boolean doMinimizeDown() {
+		boolean indicator = false;
+		if (K_MATRIX_BASE[minOrdnts[0]] < minOrdnts[2]) {
+			int[][] intTmpArr = K_matrix_N_oper;
+			intTmpArr[minOrdnts[0]][minOrdnts[1]] = 0;
+			indexReset();
+			if (fitWindow(intTmpArr)) {
+				K_matrix_N_oper = intTmpArr;
+				indicator = true;
+			}
+		}
+		return indicator;
+	}
+
+	private static boolean doMinimizeUp() {
+		boolean indicator = false;
+		if (K_MATRIX_BASE[maxOrdnts[0]] < maxOrdnts[2]) {
+			int[][] intTmpArr = K_matrix_N_oper;
+			intTmpArr[maxOrdnts[0]][maxOrdnts[1]] = 0;
+			indexReset();
+			if (fitWindow(intTmpArr)) {
+				K_matrix_N_oper = intTmpArr;
+				indicator = true;
+			}
+		}
+		return indicator;
+	}
+
+	private static void buildCombination(int elementsNo, int depth, StringBuffer output) {
+		if (depth == 0) {
+//            System.out.println(output);
+			COMBINATIONS_BASE.add(output.toString());
+		} else {
+			for (int i = 0; i < elementsNo; i++) {
+				output.append(i);
+				buildCombination(elementsNo, depth - 1, output);
+				output.deleteCharAt(output.length() - 1);
+			}
+		}
+	}
+
+	private static int getCombinationsDepth(int[] a, int[] b) {
+		int suma = 0;
+		for (int i : a)
+			suma += i;
+		int sumb = 0;
+		for (int i : b)
+			sumb += i;
+		return Math.abs(suma - sumb);
+	}
+
 	public static String MinWindowSubstring(String[] strArr) {
 		final String N = strArr[0];
 		final String K = strArr[1];
-		String result = MINIMIZED = BASE = N;
+		String result = minimized = N_BASE = N;
 
-		TARGET = getCharCounter(K);
-		TARG_IN_SRC = getTargetInSource(N);
+		K_MATRIX_BASE = getCharCounter(K);
+		K_matrix_N_oper = K_MATRIX_N_BASE = getTargetInSource(N);
 
-		MIN_INDX = Integer.MAX_VALUE;
-		MAX_INDX = Integer.MIN_VALUE;
-		if (!fitWindow(TARG_IN_SRC))
+		indexReset();
+		if (!fitWindow(K_matrix_N_oper))
 			return K + " no fits to " + N;
 
 		int minimizeIndicator = 0;
 
-		// do minimize
+		// very primitive optimization algorithm
+		// getting substring of N containing pattern K
 		while (minimizeIndicator < 2) {
 			minimizeIndicator = 0;
-			if (TARGET[MIN_ORDNTS[0]] < MIN_ORDNTS[2]) {
-				int[][] intTmpArr = TARG_IN_SRC;
-				intTmpArr[MIN_ORDNTS[0]][MIN_ORDNTS[1]] = 0;
-				MIN_INDX = Integer.MAX_VALUE;
-				if (fitWindow(intTmpArr)) {
-					TARG_IN_SRC = intTmpArr;
-					result = MINIMIZED;
-				} else
-					minimizeIndicator++;
-			} else
+
+			if (!doMinimizeDown())
 				minimizeIndicator++;
 
-			if (TARGET[MAX_ORDNTS[0]] < MAX_ORDNTS[2]) {
-				int[][] intTmpArr = TARG_IN_SRC;
-				intTmpArr[MAX_ORDNTS[0]][MAX_ORDNTS[1]] = 0;
-				MAX_INDX = Integer.MIN_VALUE;
-				if (fitWindow(intTmpArr)) {
-					TARG_IN_SRC = intTmpArr;
-					result = MINIMIZED;
-				} else
-					minimizeIndicator++;
-			} else
+			if (!doMinimizeUp())
 				minimizeIndicator++;
 		}
 
-		System.out.println(K);
-		System.out.println(Arrays.toString(TARGET));
+		// TODO implement many algorithms to get shortest result among them
+
+		result = minimized;
+
+		System.out.println("N:" + N + ",K:" + K);
+		System.out.println(Arrays.toString(K_MATRIX_BASE));
 //		System.out.println("min:" + (char) N.codePointAt(MIN_INDX - 1));
 //		System.out.println("max:" + (char) N.codePointAt(MAX_INDX - 1));
 //		System.out.println(Arrays.deepToString(targetInSource));
-
-		// TODO optimize to shortest string containing pattern K
 
 		return result;
 	}

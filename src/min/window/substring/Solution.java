@@ -1,7 +1,10 @@
 package min.window.substring;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,7 +38,7 @@ import java.util.Set;
 public class Solution {
 	private final static int ALPH_QTY = 26; // number of letters in the alphabet const.
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
-	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
+//	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
 	private static String N_BASE; // N String constans
 	private static Set<String> COMBINATIONS_BASE = new HashSet<>();
 	private static int[][] K_matrix_N_oper; // count array of all K letters in N String variable
@@ -48,15 +51,11 @@ public class Solution {
 	private static String getWindow(int[][] intTmpArr) {
 		int count = 0;
 		int notZeroCount = 0;
-		System.out.println(" -- ");
 		for (int[] arrInt : intTmpArr) {
 			notZeroCount = countNotZeroInArray(arrInt);
 			if (K_MATRIX_BASE[count] > 0 && notZeroCount >= K_MATRIX_BASE[count]) {
 				getMinFromArray(arrInt, count, notZeroCount);
 				getMaxFromArray(arrInt, count, notZeroCount);
-				System.out.println(count + "|" + Arrays.toString(arrInt) + ",MIN_INDX=" + minIndex + ",MAX_INDX="
-						+ maxIndex + ",MIN_ORDNTS=" + Arrays.toString(minOrdnts) + ",MAX_ORDNTS="
-						+ Arrays.toString(maxOrdnts));
 			}
 			count++;
 		}
@@ -143,6 +142,7 @@ public class Solution {
 		if (K_MATRIX_BASE[minOrdnts[0]] < minOrdnts[2]) {
 			int[][] intTmpArr = K_matrix_N_oper;
 			intTmpArr[minOrdnts[0]][minOrdnts[1]] = 0;
+
 			indexReset();
 			if (fitWindow(intTmpArr)) {
 				K_matrix_N_oper = intTmpArr;
@@ -157,6 +157,7 @@ public class Solution {
 		if (K_MATRIX_BASE[maxOrdnts[0]] < maxOrdnts[2]) {
 			int[][] intTmpArr = K_matrix_N_oper;
 			intTmpArr[maxOrdnts[0]][maxOrdnts[1]] = 0;
+
 			indexReset();
 			if (fitWindow(intTmpArr)) {
 				K_matrix_N_oper = intTmpArr;
@@ -166,14 +167,13 @@ public class Solution {
 		return indicator;
 	}
 
-	private static void buildCombination(int elementsNo, int depth, StringBuffer output) {
+	private static void buildUpDownCombination(int depth, StringBuffer output) {
 		if (depth == 0) {
-//            System.out.println(output);
 			COMBINATIONS_BASE.add(output.toString());
-		} else {
-			for (int i = 0; i < elementsNo; i++) {
+		} else { // 0 or 1 -> UP or DOWN
+			for (int i = 0; i < 2; i++) {
 				output.append(i);
-				buildCombination(elementsNo, depth - 1, output);
+				buildUpDownCombination(depth - 1, output);
 				output.deleteCharAt(output.length() - 1);
 			}
 		}
@@ -192,35 +192,67 @@ public class Solution {
 	public static String MinWindowSubstring(String[] strArr) {
 		final String N = strArr[0];
 		final String K = strArr[1];
-		String result = minimized = N_BASE = N;
+		N_BASE = N;
+		minimized = N;
+		String result = "";
+
+		System.out.println("N:" + N + ",K:" + K);
 
 		K_MATRIX_BASE = getCharCounter(K);
-		K_matrix_N_oper = K_MATRIX_N_BASE = getTargetInSource(N);
+		K_matrix_N_oper = getTargetInSource(N);
+//		K_MATRIX_N_BASE = getTargetInSource(N);
 
-		indexReset();
-		if (!fitWindow(K_matrix_N_oper))
-			return K + " no fits to " + N;
+		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());
+		System.out.println("COMBINATIONS_BASE=" + COMBINATIONS_BASE.size());
 
 		int minimizeIndicator = 0;
 
-		// very primitive optimization algorithm
-		// getting substring of N containing pattern K
-		while (minimizeIndicator < 2) {
+		Map<Integer, String> map = new HashMap<>();
+
+		for (String str : COMBINATIONS_BASE) {
+
+			int length = Integer.MAX_VALUE;
+			K_matrix_N_oper = getTargetInSource(N);
+			minimized = N_BASE;
+
+//			System.out.println("--K_matrix_N_oper=" + Arrays.deepToString(K_matrix_N_oper));
+
+			indexReset();
+			getWindow(K_matrix_N_oper);
+
+//			System.out.println("----K_matrix_N_oper=" + Arrays.deepToString(K_matrix_N_oper));
+
 			minimizeIndicator = 0;
+			char[] chArr = str.toCharArray();
 
-			if (!doMinimizeDown())
-				minimizeIndicator++;
+			for (char ch : chArr) {
 
-			if (!doMinimizeUp())
-				minimizeIndicator++;
+//				while (minimizeIndicator < 2) {
+
+				if (ch == ('0')) { // '0' erase down index
+					if (!doMinimizeDown())
+						minimizeIndicator++;
+				} else { // '1' erase up index, no other choice
+					if (!doMinimizeUp())
+						minimizeIndicator++;
+				}
+				System.out.println("---minimized=" + minimized + ",minimizeIndicator=" + minimizeIndicator);
+
+//				}
+
+			}
+
+			if (minimized.length() < length) {
+				map.put(minimized.length(), minimized);
+			}
+
 		}
 
-		// TODO implement many algorithms to get shortest result among them
+		result = map.get(Collections.min(map.keySet())); // minimized;
 
-		result = minimized;
-
-		System.out.println("N:" + N + ",K:" + K);
-		System.out.println(Arrays.toString(K_MATRIX_BASE));
+		System.out.println("N:" + N + ",K:" + K + ",minimizeIndicator=" + minimizeIndicator);
+		System.out.println("map=" + map.toString());
+//		System.out.println(Arrays.toString(K_MATRIX_BASE));
 //		System.out.println("min:" + (char) N.codePointAt(MIN_INDX - 1));
 //		System.out.println("max:" + (char) N.codePointAt(MAX_INDX - 1));
 //		System.out.println(Arrays.deepToString(targetInSource));
@@ -231,16 +263,17 @@ public class Solution {
 	public static void main(String[] args) {
 
 		String[] strArr = new String[] { "ahffaksfajeeubsne", "jefaa" }; // aksfaje
-		System.out.println(MinWindowSubstring(strArr));
+//		System.out.println(MinWindowSubstring(strArr) + "\n");
+//
+//		strArr = new String[] { "aaffhkksemckelloe", "fhea" }; // affhkkse
+//		System.out.println(MinWindowSubstring(strArr) + "\n");
 
-		strArr = new String[] { "aaffhkksemckelloe", "fhea" }; // affhkkse
-		System.out.println(MinWindowSubstring(strArr));
+//		strArr = new String[] { "aabdccdbcacd", "aad" }; // aabd
+		strArr = new String[] { "aabdcdbad", "aad" }; // aabd
+		System.out.println(MinWindowSubstring(strArr) + "\n");
 
-		strArr = new String[] { "aabdccdbcacd", "aad" }; // aabd
-		System.out.println(MinWindowSubstring(strArr));
-
-		strArr = new String[] { "aaabaaddae", "aed" }; // dae
-		System.out.println(MinWindowSubstring(strArr));
+//		strArr = new String[] { "aaabaaddae", "aed" }; // dae
+//		System.out.println(MinWindowSubstring(strArr) + "\n");
 	}
 
 }

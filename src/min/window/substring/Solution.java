@@ -3,9 +3,7 @@ package min.window.substring;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * CODERBYTE
@@ -40,13 +38,14 @@ public class Solution {
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
 	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
 	private static String N_BASE; // N String constans
-	private static Set<String> COMBINATIONS_BASE = new HashSet<>();
 	private static int[][] K_matrix_N_oper; // count array of all K letters in N String variable
 	private static String minimized;
 	private static int maxIndex;
 	private static int minIndex;
 	private static int[] minOrdnts; // targetInSource co-ordinates
 	private static int[] maxOrdnts; // targetInSource co-ordinates
+
+	private static Map<Integer, String> betterResultsMap;// = new HashMap<>();
 
 	private static String getWindow(int[][] intTmpArr) {
 		int count = 0;
@@ -169,7 +168,8 @@ public class Solution {
 
 	private static void buildUpDownCombination(int depth, StringBuffer output) {
 		if (depth == 0) {
-			COMBINATIONS_BASE.add(output.toString());
+//			a reference to the method inside this loop prevents java.lang.OutOfMemoryError
+			studyVariation(output.toString());
 		} else { // 0 or 1 -> UP or DOWN
 			for (int i = 0; i < 2; i++) {
 				output.append(i);
@@ -189,11 +189,42 @@ public class Solution {
 		return Math.abs(suma - sumb);
 	}
 
+	private static void studyVariation(String str) {
+		int[] rejectIndicators = new int[2];
+		int minLength = Integer.MAX_VALUE;
+		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
+		minimized = N_BASE;
+
+		indexReset();
+		getWindow(K_matrix_N_oper);
+
+		for (char ch : str.toCharArray()) {
+
+			if (rejectIndicators[0] < 1 && rejectIndicators[1] < 1) {
+
+				if (ch == ('0')) { // '0' erase down index
+					if (!doMinimizeDown())
+						rejectIndicators[0]++;
+				} else { // '1' erase up index, no other choice
+					if (!doMinimizeUp())
+						rejectIndicators[1]++;
+				}
+			} else
+
+				break; // if rejectIndicators = [1,1]
+
+		}
+
+		if (minimized.length() < minLength) {
+			betterResultsMap.put(minimized.length(), minimized);
+		}
+
+	}
+
 	public static String MinWindowSubstring(String[] strArr) {
 		final String N = strArr[0];
 		final String K = strArr[1];
-		N_BASE = N;
-		minimized = N;
+		minimized = N_BASE = N;
 		String result = "";
 
 //		System.out.println("N:" + N + ",K:" + K);
@@ -201,49 +232,13 @@ public class Solution {
 		K_MATRIX_BASE = getCharCounter(K);
 		K_MATRIX_N_BASE = getTargetInSource(N);
 		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
+		betterResultsMap = new HashMap<>();
 
 		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());
 
-		// System.out.println("COMBINATIONS_BASE=" + COMBINATIONS_BASE.size());
+		result = betterResultsMap.get(Collections.min(betterResultsMap.keySet())); // minimized;
 
-		Map<Integer, String> map = new HashMap<>();
-
-		for (String str : COMBINATIONS_BASE) {
-
-			int[] rejectIndicators = new int[2];
-			int minLength = Integer.MAX_VALUE;
-			K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
-			minimized = N_BASE;
-
-			indexReset();
-			getWindow(K_matrix_N_oper);
-
-			for (char ch : str.toCharArray()) {
-
-				if (rejectIndicators[0] < 1 && rejectIndicators[1] < 1) {
-
-					if (ch == ('0')) { // '0' erase down index
-						if (!doMinimizeDown())
-							rejectIndicators[0]++;
-					} else { // '1' erase up index, no other choice
-						if (!doMinimizeUp())
-							rejectIndicators[1]++;
-					}
-				} else
-
-					break; // if rejectIndicators = [1,1]
-
-			}
-
-			if (minimized.length() < minLength) {
-				map.put(minimized.length(), minimized);
-			}
-
-		}
-
-		result = map.get(Collections.min(map.keySet())); // minimized;
-
-//		System.out.println("map=" + map.toString());
+//		System.out.println("betterResultsMap=" + betterResultsMap.toString());
 
 		return result;
 	}
@@ -251,16 +246,23 @@ public class Solution {
 	public static void main(String[] args) {
 
 		String[] strArr = new String[] { "ahffaksfajeeubsne", "jefaa" }; // aksfaje
-		System.out.println(MinWindowSubstring(strArr) + "\n");
+		System.out.println(MinWindowSubstring(strArr));
 
 		strArr = new String[] { "aaffhkksemckelloe", "fhea" }; // affhkkse
-		System.out.println(MinWindowSubstring(strArr) + "\n");
+		System.out.println(MinWindowSubstring(strArr));
 
 		strArr = new String[] { "aabdccdbcacd", "aad" }; // aabd
-		System.out.println(MinWindowSubstring(strArr) + "\n");
+		System.out.println(MinWindowSubstring(strArr));
 
 		strArr = new String[] { "aaabaaddae", "aed" }; // dae
-		System.out.println(MinWindowSubstring(strArr) + "\n");
+		System.out.println(MinWindowSubstring(strArr));
+
+		strArr = new String[] { "aaffsfsfasfasfasfasfasfacasfafe", "fafe" }; // fafe
+		System.out.println(MinWindowSubstring(strArr));
+
+		strArr = new String[] { "aaffsfsfasfasfasfasfasfacasfafe", "fafsf" }; // affsf
+		System.out.println(MinWindowSubstring(strArr));
+
 	}
 
 }

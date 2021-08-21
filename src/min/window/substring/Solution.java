@@ -1,8 +1,9 @@
 package min.window.substring;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,11 +35,11 @@ import java.util.Map;
  * 
  */
 public class Solution {
-	private final static int ALPH_QTY = 26; // number of letters in the alphabet const.
+	private final static Integer ALPH_QTY = 26; // number of letters in the alphabet const.
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
-	private static int[][] K_MATRIX_N_BASE; // count array of all K letters in N String const.
+	private static List<List<Integer>> K_MATRIX_N_BASE; // count array of all K letters in N String const.
 	private static String N_BASE; // N String constans
-	private static int[][] K_matrix_N_oper; // count array of all K letters in N String variable
+	private static List<List<Integer>> K_matrix_N_oper; // count array of all K letters in N String variable
 	private static String minimized;
 	private static int maxIndex;
 	private static int minIndex;
@@ -47,10 +48,10 @@ public class Solution {
 
 	private static Map<Integer, String> betterResultsMap;// = new HashMap<>();
 
-	private static String getWindow(int[][] intTmpArr) {
+	private static String getWindow(List<List<Integer>> intTmpArr) {
 		int count = 0;
 		int notZeroCount = 0;
-		for (int[] arrInt : intTmpArr) {
+		for (List<Integer> arrInt : intTmpArr) {
 			notZeroCount = countNotZeroInArray(arrInt);
 			if (K_MATRIX_BASE[count] > 0 && notZeroCount >= K_MATRIX_BASE[count]) {
 				getMinFromArray(arrInt, count, notZeroCount);
@@ -61,7 +62,7 @@ public class Solution {
 		return N_BASE.substring(minIndex - 1, maxIndex);
 	}
 
-	private static int countNotZeroInArray(int[] arr) {
+	private static int countNotZeroInArray(List<Integer> arr) {
 		int count = 0;
 		for (int i : arr) {
 			if (i > 0)
@@ -70,7 +71,7 @@ public class Solution {
 		return count;
 	}
 
-	private static void getMinFromArray(int[] minArr, int alphNo, int remains) {
+	private static void getMinFromArray(List<Integer> minArr, int alphNo, int remains) {
 		int count = 0;
 		for (int min : minArr) {
 			if (min < minIndex && min > 0) {
@@ -81,7 +82,7 @@ public class Solution {
 		}
 	}
 
-	private static void getMaxFromArray(int[] maxArr, int alphNo, int remains) {
+	private static void getMaxFromArray(List<Integer> maxArr, int alphNo, int remains) {
 		int count = 0;
 		for (int max : maxArr) {
 			if (max > maxIndex && max > 0) {
@@ -108,22 +109,23 @@ public class Solution {
 		return result;
 	}
 
-	private static int[][] getTargetInSource(String source) {
-		int[][] targetInSource = new int[ALPH_QTY][source.length()];
-		int[] indexCounter = new int[ALPH_QTY];
+	private static List<List<Integer>> getTargetInSource(String source) {
+		List<List<Integer>> targetInSource = new ArrayList<>(ALPH_QTY);
+		for (int i = 0; i < ALPH_QTY; i++) {
+			targetInSource.add(new ArrayList<>(source.length()));
+		}
 		int index = 1; // starts from 1
 		for (char ch : source.toCharArray()) {
 			int alphabetNo = (ch - 'a');
 			if (K_MATRIX_BASE[alphabetNo] > 0) {
-				targetInSource[alphabetNo][indexCounter[alphabetNo]] = index;
-				indexCounter[alphabetNo]++;
+				targetInSource.get(alphabetNo).add(index);
 			}
 			index++;
 		}
 		return targetInSource;
 	}
 
-	private static boolean fitWindow(int[][] intTmpArr) {
+	private static boolean fitWindow(List<List<Integer>> intTmpArr) {
 		minimized = getWindow(intTmpArr);
 		if (compareTarget(getCharCounter(minimized))) {
 			return true;
@@ -139,8 +141,8 @@ public class Solution {
 	private static boolean doMinimizeDown() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[minOrdnts[0]] < minOrdnts[2]) {
-			int[][] intTmpArr = K_matrix_N_oper;
-			intTmpArr[minOrdnts[0]][minOrdnts[1]] = 0;
+			List<List<Integer>> intTmpArr = K_matrix_N_oper;
+			intTmpArr.get(minOrdnts[0]).set(minOrdnts[1], 0); 
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
@@ -154,8 +156,8 @@ public class Solution {
 	private static boolean doMinimizeUp() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[maxOrdnts[0]] < maxOrdnts[2]) {
-			int[][] intTmpArr = K_matrix_N_oper;
-			intTmpArr[maxOrdnts[0]][maxOrdnts[1]] = 0;
+			List<List<Integer>> intTmpArr = K_matrix_N_oper;
+			intTmpArr.get(maxOrdnts[0]).set(maxOrdnts[1], 0);
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
@@ -192,7 +194,7 @@ public class Solution {
 	private static void studyVariation(String str) {
 		int[] rejectIndicators = new int[2];
 		int minLength = Integer.MAX_VALUE;
-		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
+		K_matrix_N_oper = K_MATRIX_N_BASE;
 		minimized = N_BASE;
 
 		indexReset();
@@ -231,7 +233,7 @@ public class Solution {
 
 		K_MATRIX_BASE = getCharCounter(K);
 		K_MATRIX_N_BASE = getTargetInSource(N);
-		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
+		K_matrix_N_oper = K_MATRIX_N_BASE;
 		betterResultsMap = new HashMap<>();
 
 		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());

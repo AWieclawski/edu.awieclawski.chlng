@@ -42,6 +42,7 @@ public class Solution {
 	private static String minimized;
 	private static int maxIndex;
 	private static int minIndex;
+	private static int minLength;
 	private static int[] minOrdnts; // targetInSource co-ordinates
 	private static int[] maxOrdnts; // targetInSource co-ordinates
 
@@ -191,7 +192,6 @@ public class Solution {
 
 	private static void studyVariation(String str) {
 		int[] rejectIndicators = new int[2];
-		int minLength = Integer.MAX_VALUE;
 		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
 		minimized = N_BASE;
 
@@ -216,7 +216,9 @@ public class Solution {
 		}
 
 		if (minimized.length() < minLength) {
+			minLength = minimized.length();
 			betterResultsMap.put(minimized.length(), minimized);
+//			System.out.println("str="+str+",minLength=" + minLength + ",minimized=" + minimized);
 		}
 
 	}
@@ -226,6 +228,7 @@ public class Solution {
 		final String K = strArr[1];
 		minimized = N_BASE = N;
 		String result = "";
+		minLength = Integer.MAX_VALUE;
 
 //		System.out.println("N:" + N + ",K:" + K);
 

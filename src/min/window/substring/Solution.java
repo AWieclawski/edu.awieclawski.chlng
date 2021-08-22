@@ -140,12 +140,12 @@ public class Solution {
 	private static boolean doMinimizeDown() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[minOrdnts[0]] < minOrdnts[2]) {
-			int[][] intTmpArr = K_matrix_N_oper;
+			int[][] intTmpArr = multiArrayClone(K_matrix_N_oper);
 			intTmpArr[minOrdnts[0]][minOrdnts[1]] = 0;
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
-				K_matrix_N_oper = intTmpArr;
+				K_matrix_N_oper = multiArrayClone(intTmpArr);
 				indicator = true;
 			}
 		}
@@ -155,12 +155,12 @@ public class Solution {
 	private static boolean doMinimizeUp() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[maxOrdnts[0]] < maxOrdnts[2]) {
-			int[][] intTmpArr = K_matrix_N_oper;
+			int[][] intTmpArr = multiArrayClone(K_matrix_N_oper);
 			intTmpArr[maxOrdnts[0]][maxOrdnts[1]] = 0;
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
-				K_matrix_N_oper = intTmpArr;
+				K_matrix_N_oper = multiArrayClone(intTmpArr);
 				indicator = true;
 			}
 		}
@@ -192,7 +192,7 @@ public class Solution {
 
 	private static void studyVariation(String str) {
 		int[] rejectIndicators = new int[2];
-		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
+		K_matrix_N_oper = multiArrayClone(K_MATRIX_N_BASE);
 		minimized = N_BASE;
 
 		indexReset();
@@ -210,17 +210,25 @@ public class Solution {
 						rejectIndicators[1]++;
 				}
 			} else
-
 				break; // if rejectIndicators = [1,1]
-
 		}
 
 		if (minimized.length() < minLength) {
 			minLength = minimized.length();
 			betterResultsMap.put(minimized.length(), minimized);
-//			System.out.println("str="+str+",minLength=" + minLength + ",minimized=" + minimized);
+			
+//			System.out.println("str=" + str + ",minLength=" + minLength + ",minimized=" + minimized);
+//			System.out.println("K_MATRIX_N_BASE=" + Arrays.deepToString(K_MATRIX_N_BASE));
+//			System.out.println("K_matrix_N_oper=" + Arrays.deepToString(K_matrix_N_oper));
 		}
 
+	}
+
+	private static int[][] multiArrayClone(int[][] multiArray) {
+		if (multiArray != null)
+			return Arrays.stream(multiArray).map(int[]::clone).toArray(int[][]::new);
+		else
+			return null;
 	}
 
 	public static String MinWindowSubstring(String[] strArr) {
@@ -234,7 +242,7 @@ public class Solution {
 
 		K_MATRIX_BASE = getCharCounter(K);
 		K_MATRIX_N_BASE = getTargetInSource(N);
-		K_matrix_N_oper = Arrays.stream(K_MATRIX_N_BASE).map(int[]::clone).toArray(int[][]::new);
+		K_matrix_N_oper = multiArrayClone(K_MATRIX_N_BASE);
 		betterResultsMap = new HashMap<>();
 
 		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());

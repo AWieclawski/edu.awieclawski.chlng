@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * CODERBYTE
@@ -36,15 +37,16 @@ import java.util.Map;
  * 
  */
 public class Solution {
+//	private static int counter; // = 0;
 	private final static Integer ALPH_QTY = 26; // number of letters in the alphabet const.
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
 
 	// count array of all all K letters in N String const.
 	private static List<ArrayList<Integer>> K_MATRIX_N_BASE = new ArrayList<ArrayList<Integer>>();
 	private static String N_BASE; // N String constans
-	private static List<ArrayList<Integer>> K_matrix_N_oper = new ArrayList<ArrayList<Integer>>(); // count array of all
-																									// K letters in N
-																									// String variable
+
+	// count array of all K letters in N String variable
+	private static List<ArrayList<Integer>> K_matrix_N_oper = new ArrayList<ArrayList<Integer>>();
 	private static String minimized;
 	private static int maxIndex;
 	private static int minIndex;
@@ -147,12 +149,12 @@ public class Solution {
 	private static boolean doMinimizeDown() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[minOrdnts[0]] < minOrdnts[2]) {
-			List<ArrayList<Integer>> intTmpArr = new ArrayList<>(K_matrix_N_oper);
+			List<ArrayList<Integer>> intTmpArr = cloneMultiDimList(K_matrix_N_oper);
 			intTmpArr.get(minOrdnts[0]).set(minOrdnts[1], 0);
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
-				K_matrix_N_oper = new ArrayList<>(intTmpArr);
+				K_matrix_N_oper = cloneMultiDimList(intTmpArr);
 				indicator = true;
 			}
 		}
@@ -162,12 +164,12 @@ public class Solution {
 	private static boolean doMinimizeUp() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[maxOrdnts[0]] < maxOrdnts[2]) {
-			List<ArrayList<Integer>> intTmpArr = new ArrayList<>(K_matrix_N_oper);
+			List<ArrayList<Integer>> intTmpArr = cloneMultiDimList(K_matrix_N_oper);
 			intTmpArr.get(maxOrdnts[0]).set(maxOrdnts[1], 0);
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
-				K_matrix_N_oper = new ArrayList<>(intTmpArr);
+				K_matrix_N_oper = cloneMultiDimList(intTmpArr);
 				indicator = true;
 			}
 		}
@@ -197,9 +199,13 @@ public class Solution {
 		return Math.abs(suma - sumb);
 	}
 
+	private static List<ArrayList<Integer>> cloneMultiDimList(List<ArrayList<Integer>> firstList) {
+		return new ArrayList<>(firstList.stream().map(x -> new ArrayList<>(x)).collect(Collectors.toList()));
+	}
+
 	private static void studyVariation(String str) {
 		int[] rejectIndicators = new int[2];
-		K_MATRIX_N_BASE = getTargetInSource(N_BASE); // new ArrayList<>(K_MATRIX_N_BASE);
+		K_matrix_N_oper = cloneMultiDimList(K_MATRIX_N_BASE);
 		minimized = N_BASE;
 
 		indexReset();
@@ -218,15 +224,17 @@ public class Solution {
 				}
 			} else
 				break; // if rejectIndicators = [1,1]
+//			counter++;
 		}
 
 		if (minimized.length() < minLength) {
 			minLength = minimized.length();
 			betterResultsMap.put(minimized.length(), minimized);
-//			System.out.println("str=" + str + ",minimized.length()=" + minimized.length() + ",minLength=" + minLength
-//					+ ",minimized=" + minimized);
+			
+//			System.out.println(
+//					"str=" + str + ",minLength=" + minLength + ",minimized=" + minimized + ",counter=" + counter);
+//			System.out.println("K_MATRIX_N_BASE=" + K_MATRIX_N_BASE);
 		}
-
 	}
 
 	public static String MinWindowSubstring(String[] strArr) {
@@ -234,13 +242,14 @@ public class Solution {
 		final String K = strArr[1];
 		minimized = N_BASE = N;
 		String result = "";
+//		counter = 0;
 
 //		System.out.println("N:" + N + ",K:" + K);
 
 		K_MATRIX_BASE = getCharCounter(K);
 		K_MATRIX_N_BASE = getTargetInSource(N);
 
-		K_matrix_N_oper = new ArrayList<>(K_MATRIX_N_BASE);
+		K_matrix_N_oper = cloneMultiDimList(K_MATRIX_N_BASE);
 		betterResultsMap = new HashMap<>();
 		minLength = Integer.MAX_VALUE;
 
@@ -248,7 +257,7 @@ public class Solution {
 
 		result = betterResultsMap.get(Collections.min(betterResultsMap.keySet())); // minimized;
 
-		System.out.println("betterResultsMap=" + betterResultsMap.toString());
+//		System.out.println("betterResultsMap=" + betterResultsMap.toString());
 
 		return result;
 	}

@@ -1,6 +1,7 @@
 package min.window.substring;
 
 import java.util.ArrayList;
+//import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,21 +38,26 @@ import java.util.Map;
 public class Solution {
 	private final static Integer ALPH_QTY = 26; // number of letters in the alphabet const.
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
-	private static List<List<Integer>> K_MATRIX_N_BASE; // count array of all K letters in N String const.
+
+	// count array of all all K letters in N String const.
+	private static List<ArrayList<Integer>> K_MATRIX_N_BASE = new ArrayList<ArrayList<Integer>>();
 	private static String N_BASE; // N String constans
-	private static List<List<Integer>> K_matrix_N_oper; // count array of all K letters in N String variable
+	private static List<ArrayList<Integer>> K_matrix_N_oper = new ArrayList<ArrayList<Integer>>(); // count array of all
+																									// K letters in N
+																									// String variable
 	private static String minimized;
 	private static int maxIndex;
 	private static int minIndex;
+	private static int minLength; // = Integer.MAX_VALUE;
 	private static int[] minOrdnts; // targetInSource co-ordinates
 	private static int[] maxOrdnts; // targetInSource co-ordinates
 
 	private static Map<Integer, String> betterResultsMap;// = new HashMap<>();
 
-	private static String getWindow(List<List<Integer>> intTmpArr) {
+	private static String getWindow(List<ArrayList<Integer>> intTmpArr) {
 		int count = 0;
 		int notZeroCount = 0;
-		for (List<Integer> arrInt : intTmpArr) {
+		for (ArrayList<Integer> arrInt : intTmpArr) {
 			notZeroCount = countNotZeroInArray(arrInt);
 			if (K_MATRIX_BASE[count] > 0 && notZeroCount >= K_MATRIX_BASE[count]) {
 				getMinFromArray(arrInt, count, notZeroCount);
@@ -62,7 +68,7 @@ public class Solution {
 		return N_BASE.substring(minIndex - 1, maxIndex);
 	}
 
-	private static int countNotZeroInArray(List<Integer> arr) {
+	private static int countNotZeroInArray(ArrayList<Integer> arr) {
 		int count = 0;
 		for (int i : arr) {
 			if (i > 0)
@@ -71,7 +77,7 @@ public class Solution {
 		return count;
 	}
 
-	private static void getMinFromArray(List<Integer> minArr, int alphNo, int remains) {
+	private static void getMinFromArray(ArrayList<Integer> minArr, int alphNo, int remains) {
 		int count = 0;
 		for (int min : minArr) {
 			if (min < minIndex && min > 0) {
@@ -82,7 +88,7 @@ public class Solution {
 		}
 	}
 
-	private static void getMaxFromArray(List<Integer> maxArr, int alphNo, int remains) {
+	private static void getMaxFromArray(ArrayList<Integer> maxArr, int alphNo, int remains) {
 		int count = 0;
 		for (int max : maxArr) {
 			if (max > maxIndex && max > 0) {
@@ -109,8 +115,8 @@ public class Solution {
 		return result;
 	}
 
-	private static List<List<Integer>> getTargetInSource(String source) {
-		List<List<Integer>> targetInSource = new ArrayList<>(ALPH_QTY);
+	private static List<ArrayList<Integer>> getTargetInSource(String source) {
+		List<ArrayList<Integer>> targetInSource = new ArrayList<>(ALPH_QTY);
 		for (int i = 0; i < ALPH_QTY; i++) {
 			targetInSource.add(new ArrayList<>(source.length()));
 		}
@@ -125,7 +131,7 @@ public class Solution {
 		return targetInSource;
 	}
 
-	private static boolean fitWindow(List<List<Integer>> intTmpArr) {
+	private static boolean fitWindow(List<ArrayList<Integer>> intTmpArr) {
 		minimized = getWindow(intTmpArr);
 		if (compareTarget(getCharCounter(minimized))) {
 			return true;
@@ -141,12 +147,12 @@ public class Solution {
 	private static boolean doMinimizeDown() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[minOrdnts[0]] < minOrdnts[2]) {
-			List<List<Integer>> intTmpArr = K_matrix_N_oper;
-			intTmpArr.get(minOrdnts[0]).set(minOrdnts[1], 0); 
+			List<ArrayList<Integer>> intTmpArr = new ArrayList<>(K_matrix_N_oper);
+			intTmpArr.get(minOrdnts[0]).set(minOrdnts[1], 0);
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
-				K_matrix_N_oper = intTmpArr;
+				K_matrix_N_oper = new ArrayList<>(intTmpArr);
 				indicator = true;
 			}
 		}
@@ -156,12 +162,12 @@ public class Solution {
 	private static boolean doMinimizeUp() {
 		boolean indicator = false;
 		if (K_MATRIX_BASE[maxOrdnts[0]] < maxOrdnts[2]) {
-			List<List<Integer>> intTmpArr = K_matrix_N_oper;
+			List<ArrayList<Integer>> intTmpArr = new ArrayList<>(K_matrix_N_oper);
 			intTmpArr.get(maxOrdnts[0]).set(maxOrdnts[1], 0);
 
 			indexReset();
 			if (fitWindow(intTmpArr)) {
-				K_matrix_N_oper = intTmpArr;
+				K_matrix_N_oper = new ArrayList<>(intTmpArr);
 				indicator = true;
 			}
 		}
@@ -193,8 +199,7 @@ public class Solution {
 
 	private static void studyVariation(String str) {
 		int[] rejectIndicators = new int[2];
-		int minLength = Integer.MAX_VALUE;
-		K_matrix_N_oper = K_MATRIX_N_BASE;
+		K_MATRIX_N_BASE = getTargetInSource(N_BASE); // new ArrayList<>(K_MATRIX_N_BASE);
 		minimized = N_BASE;
 
 		indexReset();
@@ -212,13 +217,14 @@ public class Solution {
 						rejectIndicators[1]++;
 				}
 			} else
-
 				break; // if rejectIndicators = [1,1]
-
 		}
 
 		if (minimized.length() < minLength) {
+			minLength = minimized.length();
 			betterResultsMap.put(minimized.length(), minimized);
+//			System.out.println("str=" + str + ",minimized.length()=" + minimized.length() + ",minLength=" + minLength
+//					+ ",minimized=" + minimized);
 		}
 
 	}
@@ -233,14 +239,16 @@ public class Solution {
 
 		K_MATRIX_BASE = getCharCounter(K);
 		K_MATRIX_N_BASE = getTargetInSource(N);
-		K_matrix_N_oper = K_MATRIX_N_BASE;
+
+		K_matrix_N_oper = new ArrayList<>(K_MATRIX_N_BASE);
 		betterResultsMap = new HashMap<>();
+		minLength = Integer.MAX_VALUE;
 
 		buildUpDownCombination(getCombinationsDepth(getCharCounter(N), K_MATRIX_BASE), new StringBuffer());
 
 		result = betterResultsMap.get(Collections.min(betterResultsMap.keySet())); // minimized;
 
-//		System.out.println("betterResultsMap=" + betterResultsMap.toString());
+		System.out.println("betterResultsMap=" + betterResultsMap.toString());
 
 		return result;
 	}

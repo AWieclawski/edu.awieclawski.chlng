@@ -29,18 +29,23 @@ public class PyramidComplexBlocks {
 
 	public static int getBlockNumber(int side, int row, int col, int level) {
 		BlockData blockData = pyramidBuilder(side).stream()
-				.filter(block -> block.getLevel() == level && block.getRow() == row && block.getCol() == col).findAny()
+				.filter(block -> block.getLevel() == level
+						&& block.getRow() == row
+						&& block.getCol() == col)
+				.findAny()
 				.orElseThrow(() -> new NoSuchElementException("Block number not found"));
 		int result = blockData.getValue();
-		print(String.format(" BlockNumber=%d, where sides size=%d, level=%d, row=%d, col=%d", result, side, level, row,
+		print(String.format(" BlockNumber=%d, where sides size=%d, level=%d, row=%d, col=%d",
+				result, side, level, row,
 				col));
 
 		return result;
 	}
 
 	public static int countElements(int side) {
-		int result = pyramidBuilder(side).stream().mapToInt(v -> v.getValue()).max()
-				.orElseThrow(() -> new NoSuchElementException("Blocks number not calculated"));
+		int result = pyramidBuilder(side).stream()
+				.mapToInt(v -> v.getValue()).max()
+				.orElseThrow(() -> new NoSuchElementException("Elements number not calculated"));
 		print(String.format(" CountElements=%d, where sides size=%d", result, side));
 
 		return result;
@@ -110,7 +115,8 @@ public class PyramidComplexBlocks {
 
 		@Override
 		public String toString() {
-			return "BlockData [level=" + level + ", row=" + row + ", col=" + col + ", value=" + value + "] \n";
+			return "BlockData [level=" + level + ", row=" + row + ", col=" + col + ", value="
+					+ value + "] \n";
 		}
 
 	}

@@ -38,7 +38,8 @@ public class HtmlTagParser {
 		try {
 			linesList = getLinesFromFile(filePath);
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, String.format("Can not get lines from file: %s", filePath));
+			LOGGER.log(Level.SEVERE,
+					String.format("Can not get lines from file: %s", filePath));
 		}
 
 		print(replaceMultiNewLines(removeTags(readLinesToString(linesList))));
@@ -55,6 +56,7 @@ public class HtmlTagParser {
 		while (input.contains("##")) {
 			input = input.replaceAll("##", "#");
 		}
+
 		input = input.replaceAll("#", "\n");
 
 		return input;
@@ -66,7 +68,11 @@ public class HtmlTagParser {
 			return input;
 		}
 
-		final Pattern[] patternArray = { Pattern.compile("<.+?>"), Pattern.compile("<!---"), Pattern.compile("-->"), };
+		final Pattern[] patternArray = {
+				Pattern.compile("<.+?>"),
+				Pattern.compile("<!---"),
+				Pattern.compile("-->"),
+		};
 
 		for (Pattern pattern : patternArray) {
 			Matcher m = pattern.matcher(input);

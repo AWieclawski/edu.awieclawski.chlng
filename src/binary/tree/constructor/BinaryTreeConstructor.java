@@ -1,10 +1,17 @@
 package binary.tree.constructor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.junit.ComparisonFailure;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -34,7 +41,12 @@ import java.util.Set;
  * Input: new String[] {"(1,2)", "(3,2)", "(2,12)", "(5,2)"} Output: false
  *
  */
-public class Solution {
+public class BinaryTreeConstructor {
+
+	private static String[] INPUT_ARRAY;
+	private final static Logger LOGGER = Logger.getLogger(BinaryTreeConstructor.class.getName());
+	private final static String TRUE = "true";
+	private final static String FALSE = "false";
 
 	public static String masterTreeConstructor(String[] strArr) {
 		Set<String> children = new HashSet<>();
@@ -48,7 +60,7 @@ public class Solution {
 			Integer countParents = parents.get(values[1]);
 			// If a parent node has more than two child nodes, the tree is non-binary
 			if (countParents != null && countParents + 1 > 2) {
-				return "false";
+				return FALSE;
 			} else {
 				parents.put(values[1], (countParents == null ? 1 : ++countParents));
 			}
@@ -56,50 +68,92 @@ public class Solution {
 		// If the size of the children Set, is less than the length of the input array,
 		// it means that the same child has
 		// more than one parent, which makes the tree non-binary.
-//		System.out.println("childSize=" + children.size() + ",arrLngth=" + strArr.length);
+
+		LOGGER.log(Level.INFO,
+				String.format("size of the children Set= %s ,length of the input array=%s",
+						children.size(), strArr.length));
+
 		return "" + (children.size() == strArr.length);
 	}
 
 	public static String TreeConstructor(String[] strArr) {
 		int[] parents = new int[99]; // limited to checking only two-digit numbers
 		int[] children = new int[99]; // limited to checking only two-digit numbers
+		String logInfo = "TreeConstructor";
 
 		for (String a : strArr) {
-			Integer[] pair = Arrays.stream(a.replaceAll("[\\[\\](){}]", "").replaceAll("\\s+", "").split(","))
+			Integer[] pair = Arrays
+					.stream(a.replaceAll("[\\[\\](){}]", "").replaceAll("\\s+", "").split(","))
 					.map(Integer::parseInt).toArray(Integer[]::new);
 			parents[pair[1]]++;
 			children[pair[0]]++;
 
-			if (parents[pair[1]] > 2 || children[pair[0]] > 1)
-				return "false";
+			if (parents[pair[1]] > 2 || children[pair[0]] > 1) {
+				LOGGER.log(Level.INFO,
+						String.format("%s result: %s", logInfo, "false"));
+				return FALSE;
+			}
 		}
 
-		return "true";
+		LOGGER.log(Level.INFO,
+				String.format("%s result: %s", logInfo, "true"));
+		return TRUE;
 	}
 
 	public static void main(String[] args) {
-		String[] strArr = null;
 
-		strArr = new String[] { "(1,2)", "(2,4)", "(5,7)", "(7,2)", "(9,5)" }; // true
-		System.out.println(TreeConstructor(strArr));
+		boolean isFailure = false;
 
-		strArr = new String[] { "(1,2)", "(3,2)", "(2,12)", "(5,2)" }; // false
-		System.out.println(TreeConstructor(strArr));
+		try {
+			new BinaryTreeConstructor().doTests();
+		} catch (ComparisonFailure e) {
+			isFailure = true;
+			LOGGER.log(Level.SEVERE,
+					String.format("%s \n - Assertion failure: %s", e.getMessage(),
+							INPUT_ARRAY.toString()));
+		}
+		if (!isFailure)
+			LOGGER.log(Level.INFO,
+					"Tests passed OK. No Assertion failure thrown.");
+	}
 
-		strArr = new String[] { "(2,5)", "(2,6)" }; // false
-		System.out.println(TreeConstructor(strArr));
+	@Test
+	public void doTests() throws ComparisonFailure {
 
-		strArr = new String[] { "(2,3)", "(1,2)", "(4,9)", "(9,3)", "(12,9)", "(6,4)", "(1,9)" }; // false
-		System.out.println(TreeConstructor(strArr));
+		INPUT_ARRAY = new String[] {
+				"(1,2)", "(2,4)", "(5,7)", "(7,2)", "(9,5)"
+		}; // true
+		assertEquals(TreeConstructor(INPUT_ARRAY), TRUE);
 
-		strArr = new String[] { "(5,6)", "(6,3)", "(2,3)", "(12,5)" }; // true
-		System.out.println(TreeConstructor(strArr));
+		INPUT_ARRAY = new String[] {
+				"(1,2)", "(3,2)", "(2,12)", "(5,2)"
+		}; // false
+		assertEquals(TreeConstructor(INPUT_ARRAY), FALSE);
 
-		strArr = new String[] { "(1,2)", "(2,4)", "(7,4)" }; // true
-		System.out.println(TreeConstructor(strArr));
-		
-		strArr = new String[] {"(10,20)", "(20,50)"}; // true
-		System.out.println(TreeConstructor(strArr));
+		INPUT_ARRAY = new String[] {
+				"(2,5)", "(2,6)"
+		}; // false
+		assertEquals(TreeConstructor(INPUT_ARRAY), FALSE);
+
+		INPUT_ARRAY = new String[] {
+				"(2,3)", "(1,2)", "(4,9)", "(9,3)", "(12,9)", "(6,4)", "(1,9)"
+		}; // false
+		assertEquals(TreeConstructor(INPUT_ARRAY), FALSE);
+
+		INPUT_ARRAY = new String[] {
+				"(5,6)", "(6,3)", "(2,3)", "(12,5)"
+		}; // true
+		assertEquals(TreeConstructor(INPUT_ARRAY), TRUE);
+
+		INPUT_ARRAY = new String[] {
+				"(1,2)", "(2,4)", "(7,4)"
+		}; // true
+		assertEquals(TreeConstructor(INPUT_ARRAY), TRUE);
+
+		INPUT_ARRAY = new String[] {
+				"(10,20)", "(20,50)"
+		}; // true
+		assertEquals(TreeConstructor(INPUT_ARRAY), TRUE);
 
 	}
 

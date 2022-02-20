@@ -14,9 +14,9 @@ import java.util.regex.Pattern;
 
 /**
  * 
- * As input we get an HTML file. Write a program that will delete all of them
- * HTML tags and will keep only the text they contain. Result should be
- * displayed on the screen. *
+ * As input we get an HTML file. Write a program that removes all HTML tags and
+ * keeps only the text contained in them. The result should be displayed on the
+ * screen.
  * 
  * @author AWieclawski
  *

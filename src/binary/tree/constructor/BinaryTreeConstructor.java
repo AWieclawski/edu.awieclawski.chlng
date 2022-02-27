@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.ComparisonFailure;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 /**
  * 

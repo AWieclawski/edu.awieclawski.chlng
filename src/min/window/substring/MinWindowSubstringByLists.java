@@ -1,12 +1,19 @@
 package min.window.substring;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 //import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import org.junit.ComparisonFailure;
+import org.junit.Test;
 
 /**
  * CODERBYTE
@@ -36,7 +43,10 @@ import java.util.stream.Collectors;
  * Input: new String[] {"aaffhkksemckelloe", "fhea"} Output: affhkkse
  * 
  */
-public class SolutionII {
+public class MinWindowSubstringByLists {
+	private String[] strArr = null;
+	private final static Logger LOGGER = Logger.getLogger(MinWindowSubstringByLists.class.getName());
+
 //	private static int counter; // = 0;
 	private final static Integer ALPH_QTY = 26; // number of letters in the alphabet const.
 	private static int[] K_MATRIX_BASE; // count array of all K letters const.
@@ -50,7 +60,7 @@ public class SolutionII {
 	private static String minimized;
 	private static int maxIndex;
 	private static int minIndex;
-	private static int minLength; // = Integer.MAX_VALUE;
+	private static int minLength;
 	private static int[] minOrdnts; // targetInSource co-ordinates
 	private static int[] maxOrdnts; // targetInSource co-ordinates
 
@@ -84,7 +94,9 @@ public class SolutionII {
 		for (int min : minArr) {
 			if (min < minIndex && min > 0) {
 				minIndex = min;
-				minOrdnts = new int[] { alphNo, count, remains };
+				minOrdnts = new int[] {
+						alphNo, count, remains
+				};
 			}
 			count++;
 		}
@@ -95,7 +107,9 @@ public class SolutionII {
 		for (int max : maxArr) {
 			if (max > maxIndex && max > 0) {
 				maxIndex = max;
-				maxOrdnts = new int[] { alphNo, count, remains };
+				maxOrdnts = new int[] {
+						alphNo, count, remains
+				};
 			}
 			count++;
 		}
@@ -180,7 +194,8 @@ public class SolutionII {
 		if (depth == 0) {
 //			a reference to the method inside this loop prevents java.lang.OutOfMemoryError
 			studyVariation(output.toString());
-		} else { // 0 or 1 -> UP or DOWN
+		}
+		else { // 0 or 1 -> UP or DOWN
 			for (int i = 0; i < 2; i++) {
 				output.append(i);
 				buildUpDownCombination(depth - 1, output);
@@ -220,24 +235,20 @@ public class SolutionII {
 				if (ch == ('0')) { // '0' erase down index
 					if (!doMinimizeDown())
 						rejectIndicators[0]++;
-				} else { // '1' erase up index, no other choice
+				}
+				else { // '1' erase up index, no other choice
 					if (!doMinimizeUp())
 						rejectIndicators[1]++;
 				}
-			} else
+			}
+			else
 				break; // if rejectIndicators = [1,1]
-//			counter++;
 		}
 
 		if (minimized.length() < minLength) {
 			minLength = minimized.length();
 			betterResultsMap.put(minimized.length(), minimized);
 
-//			System.out.println(
-//					"str=" + str + ",minLength=" + minLength + ",minimized=" + minimized); 
-			// + ",counter=" + counter);
-//			System.out.println("K_MATRIX_N_BASE=" + K_MATRIX_N_BASE);
-//			System.out.println("K_matrix_N_oper=" + K_matrix_N_oper);
 		}
 	}
 
@@ -246,9 +257,6 @@ public class SolutionII {
 		final String K = strArr[1];
 		minimized = N_BASE = N;
 		String result = "";
-//		counter = 0;
-
-//		System.out.println("N:" + N + ",K:" + K);
 
 		K_MATRIX_BASE = getCharCounter(K);
 		K_MATRIX_N_BASE = getTargetInSource(N);
@@ -261,32 +269,26 @@ public class SolutionII {
 
 		result = betterResultsMap.get(Collections.min(betterResultsMap.keySet())); // minimized;
 
-//		System.out.println("betterResultsMap=" + betterResultsMap.toString());
+		LOGGER.log(Level.WARNING, " -- betterResultsMap=" + betterResultsMap.toString());
 
 		return result;
 	}
 
 	public static void main(String[] args) {
 
+		doBigRun();
+	}
+
+	private static void doBigRun() {
+
+		String[] strArrMn = new String[] {
+				"aaffsfsfasfasfasfasfasfacasfafe", "fafsf"
+		}; // affsf
+		System.out.println("MinWindowSubstring started. [source,pattern]=["
+				+ strArrMn[0] + "," + strArrMn[1] + "]");
+
 		long start = System.nanoTime();
-
-		String[] strArr = new String[] { "ahffaksfajeeubsne", "jefaa" }; // aksfaje
-//		System.out.println(MinWindowSubstring(strArr));
-//
-//		strArr = new String[] { "aaffhkksemckelloe", "fhea" }; // affhkkse
-//		System.out.println(MinWindowSubstring(strArr));
-//
-//		strArr = new String[] { "aabdccdbcacd", "aad" }; // aabd
-//		System.out.println(MinWindowSubstring(strArr));
-//
-//		strArr = new String[] { "aaabaaddae", "aed" }; // dae
-//		System.out.println(MinWindowSubstring(strArr));
-//
-//		strArr = new String[] { "aaffsfsfasfasfasfasfasfacasfafe", "fafe" }; // fafe
-//		System.out.println(MinWindowSubstring(strArr));
-
-		strArr = new String[] { "aaffsfsfasfasfasfasfasfacasfafe", "fafsf" }; // affsf
-		System.out.println(MinWindowSubstring(strArr));
+		System.out.println(MinWindowSubstring(strArrMn));
 
 		long finish = System.nanoTime();
 		long milion = 1_000_000_000;
@@ -297,6 +299,57 @@ public class SolutionII {
 //		long day = (tempSec / (24 * 60 * 60)) % 24;
 
 		System.out.println("Time elapsed - " + "hr:" + hour + ",min:" + min + ",sec:" + sec);
+
+	}
+
+	@Test
+	public void doTests01() throws ComparisonFailure {
+		strArr = new String[] {
+				"ahffaksfajeeubsne", "jefaa"
+		}; // aksfaje
+
+		assertEquals(MinWindowSubstring(strArr), ("aksfaje"));
+
+	}
+
+	@Test
+	public void doTests02() throws ComparisonFailure {
+		strArr = new String[] {
+				"aaffhkksemckelloe", "fhea"
+		}; // affhkkse
+
+		assertEquals(MinWindowSubstring(strArr), ("affhkkse"));
+
+	}
+
+	@Test
+	public void doTests03() throws ComparisonFailure {
+		strArr = new String[] {
+				"aabdccdbcacd", "aad"
+		}; // aabd
+
+		assertEquals(MinWindowSubstring(strArr), ("aabd"));
+
+	}
+
+	@Test
+	public void doTests05() throws ComparisonFailure {
+		strArr = new String[] {
+				"aaabaaddae", "aed"
+		}; // dae
+
+		assertEquals(MinWindowSubstring(strArr), ("dae"));
+
+	}
+
+	@Test
+	public void doTests06() throws ComparisonFailure {
+		strArr = new String[] {
+				"aaffsfsfasfasfasfasfasfacasfafe", "fafe"
+		}; // fafe
+
+		assertEquals(MinWindowSubstring(strArr), ("fafe"));
+
 	}
 
 }

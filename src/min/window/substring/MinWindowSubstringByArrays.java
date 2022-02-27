@@ -269,26 +269,27 @@ public class MinWindowSubstringByArrays {
 	}
 
 	private static void doBigRun() {
-
 		String[] strArrMn = new String[] {
 				"aaffsfsfasfasfasfasfasfacasfafe", "fafsf"
 		}; // affsf
-		System.out.println("MinWindowSubstring started. [source,pattern]=["
+
+		System.out.println("MinWindowSubstring started. [N,K]=["
 				+ strArrMn[0] + "," + strArrMn[1] + "]");
 
 		long start = System.nanoTime();
-		System.out.println(MinWindowSubstring(strArrMn));
-
+		String result = MinWindowSubstring(strArrMn);
 		long finish = System.nanoTime();
+
+		System.out.println(String.format("The smallest substring of N that contains all the "
+				+ " characters in K is: \"%s\" ", result));
+
 		long milion = 1_000_000_000;
 		long tempSec = (finish - start) / milion;
 		long sec = tempSec % 60;
 		long min = (tempSec / 60) % 60;
 		long hour = (tempSec / (60 * 60)) % 24;
-//		long day = (tempSec / (24 * 60 * 60)) % 24;
 
 		System.out.println("Time elapsed - " + "hr:" + hour + ",min:" + min + ",sec:" + sec);
-
 	}
 
 	@Test
